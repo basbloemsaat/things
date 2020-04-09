@@ -7,12 +7,15 @@ div#container {
 
 
 div#chart_base,
-div#chart_options,
 svg {
     padding: 0;
     margin: 0;
 }
 
+div#chart_options {
+    padding: 0.3rem;
+    background-color: red;
+}
 
 svg#chart {
     /*border: 1px solid green;*/
