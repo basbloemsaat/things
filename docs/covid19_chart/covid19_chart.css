@@ -2,7 +2,6 @@ div#container {
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    /*border: 1px solid red;*/
 }
 
 
@@ -14,11 +13,10 @@ svg {
 
 div#chart_options {
     padding: 0.3rem;
-    background-color: red;
+    border-bottom: 1px solid black;
 }
 
 svg#chart {
-    /*border: 1px solid green;*/
     width: 100%;
     height: 100%;
 }
