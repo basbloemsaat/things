@@ -23,7 +23,7 @@ class Chart {
         this.x_axis_g.call(this.x_axis);
 
         this.y = d3.scaleLinear()
-            .domain([1000, 0])
+            .domain([50000, 0])
             .range([0, 100]);
         this.y_axis = d3.axisLeft(this.y)
         this.y_axis_g.call(this.y_axis);
