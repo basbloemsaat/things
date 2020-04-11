@@ -32,7 +32,6 @@ class Chart {
     }
 
     reposistion_elements() {
-        console.log('xyz')
         let x_height = this.x_axis_g.node().getBBox()['height'];
         let y_width = this.y_axis_g.node().getBBox()['width'];
 
