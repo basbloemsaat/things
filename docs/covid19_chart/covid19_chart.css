@@ -22,6 +22,8 @@ svg#chart {
 }
 
 circle.dp {
-    r: 0.1rem;
-    fill: black;
+    r: 2;
+    fill: white;
+    stroke: black;
+    stroke-width: 1;
 }
