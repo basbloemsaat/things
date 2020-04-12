@@ -19,13 +19,13 @@ class Chart {
         // default scales, used for sizing
         this.x = d3.scaleTime()
             .domain([new Date(2019, 11, 31), new Date()])
-            .range([0, 100]);
+            .range([0, 100])
         this.x_axis = d3.axisBottom(this.x)
         this.x_axis_g.call(this.x_axis);
 
         this.y = d3.scaleLinear()
-            .domain([50000, 0])
-            .range([0, 100]);
+            .domain([40000, 0])
+            .range([0, 100])
         this.y_axis = d3.axisLeft(this.y)
         this.y_axis_g.call(this.y_axis);
 

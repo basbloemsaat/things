@@ -38,6 +38,8 @@ Promise.all([
             })
         .object(files[2]);
 
+    console.log(data.prepped)
+
     prep_data();
     draw_chart();
 }).catch(function(err) {
@@ -45,13 +47,57 @@ Promise.all([
     console.log(err)
 })
 
+
+let clone_data_obj = (obj) => {
+    let data_clone = JSON.parse(JSON.stringify(obj));
+    delete data_clone["Province/State"]
+    delete data_clone["Country/Region"]
+    delete data_clone["Lat"]
+    delete data_clone["Long"]
+    return Object.entries(data_clone)
+}
+
 let prep_data = () => {
-    let keys = Object.keys(data.confirmed);
-    keys = keys.concat(Object.keys(data.deaths));
-    keys = keys.concat(Object.keys(data.recovered));
+    let unique_keys = [...new Set( Object.keys(data.confirmed), Object.keys(data.deaths), Object.keys(data.recovered))];
 
-    let unique_keys = [...new Set(keys)];
+    for (let i = 0; i < unique_keys.length; i++) {
+        let key = unique_keys[i];
+        let prepped = {
+            dates: {},
+        };
+        let d = {
+            confirmed: (data.confirmed[key] || [])[0] || {},
+            deaths: (data.deaths[key] || [])[0] || {},
+            recovered: (data.recovered[key] || [])[0] || {},
+        }
 
+        prepped['Country/Region'] = d.confirmed['Country/Region'] || d.deaths['Country/Region'] || d.recovered['Country/Region']
+        prepped['Province/State'] = d.confirmed['Province/State'] || d.deaths['Province/State'] || d.recovered['Province/State']
+
+
+        let x = ['confirmed', 'deaths', 'recovered'];
+        x.forEach((e) => {
+            if (!d[e]) {
+                return;
+            }
+            let cc = clone_data_obj(d[e]);
+            let last_cc = 0;
+            for (let i = 0; i < cc.length; i++) {
+                if (!prepped.dates[cc[i][0]]) {
+                    prepped.dates[cc[i][0]] = {
+                        date: new Date(cc[i][0])
+                    };
+                }
+                prepped.dates[cc[i][0]][e] = cc[i][1];
+                prepped.dates[cc[i][0]]['delta_' + e] = cc[i][1] - last_cc;
+                last_cc = cc[i][1];
+            }
+        })
+
+        prepped['array'] = Object.values(prepped.dates);
+
+        data.prepped[key] = prepped;
+    }
 
 }
 
@@ -67,33 +113,16 @@ window.addEventListener("resize", redraw);
 redraw();
 
 let draw_chart = () => {
-    // console.log(chart);
+    console.log(data.prepped['Netherlands']);
 
-    // points['Netherlands'] = chart.canvas.append('g').classed('Netherlands', true);
-    // let data_clone = JSON.parse(JSON.stringify(data.confirmed['Netherlands'][''][0]));
-    // delete data_clone["Province/State"]
-    // delete data_clone["Country/Region"]
-    // delete data_clone["Lat"]
-    // delete data_clone["Long"]
-    // let adata = Object.entries(data_clone)
+    points['Netherlands'] = chart.canvas.append('g').classed('Netherlands', true);
+    let a = points['Netherlands'].selectAll('circle.dp')
+        .data(data.prepped['Netherlands'].array, function(d) { return d['date'] });
+    a.enter().append('circle')
+        .classed('dp', true)
+        .attr('cx', function(d) { return chart.x(d['date']) })
+        .attr('cy', function(d) { return chart.y(d['confirmed']) })
 
-    // let last = 0;
-    // adata = adata.map(e => {
-    //     // console.log(e); 
-
-    //     e[0] = new Date(e[0])
-
-    //     e[2] = e[1] - last;
-    //     last = e[1];
-    //     return e;
-    // })
-    // console.log(adata);
-
-    // let a = points['Netherlands'].selectAll('circle.dp')
-    //     .data(adata, function(d) { return d[0] });
-    // a.enter().append('circle')
-    //     .classed('dp', true)
-    //     .attr('cx', function(d) { return chart.x(d[0]) })
-    //     .attr('cy', function(d) { return chart.y(d[1]) })
+    console.log(chart.y)
 
 }
