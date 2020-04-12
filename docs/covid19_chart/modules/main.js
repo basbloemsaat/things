@@ -38,11 +38,16 @@ Promise.all([
     console.log(err)
 })
 
+let prep_data = (data) => {
+    
+}
+
 let redraw = () => {
     svg.attr('height', window.innerHeight - Math.ceil(d3.select('div#chart_options').node().offsetHeight) - 10)
     chart.reposistion_elements();
 }
 
+let points = {};
 let curves = {};
 
 window.addEventListener("resize", redraw);
@@ -51,7 +56,7 @@ redraw();
 let draw_chart = () => {
     console.log(chart);
 
-    curves['Netherlands'] = chart.canvas.append('g').classed('Netherlands', true);
+    points['Netherlands'] = chart.canvas.append('g').classed('Netherlands', true);
     let data_clone = JSON.parse(JSON.stringify(data.confirmed['Netherlands'][''][0]));
     delete data_clone["Province/State"]
     delete data_clone["Country/Region"]
@@ -71,10 +76,11 @@ let draw_chart = () => {
     })
     console.log(adata);
 
-    let a = curves['Netherlands'].selectAll('circle.dp')
+    let a = points['Netherlands'].selectAll('circle.dp')
         .data(adata, function(d) { return d[0] });
     a.enter().append('circle')
         .classed('dp', true)
         .attr('cx', function(d) {return chart.x(d[0])})
         .attr('cy', function(d) {return chart.y(d[1])})
+
 }

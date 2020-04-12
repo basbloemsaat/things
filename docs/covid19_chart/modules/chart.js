@@ -7,6 +7,7 @@ let config = {
 class Chart {
     constructor(svg) {
         this.svg = svg;
+        this.curves = [];
 
 
         let g = this.g = svg.append('g')
@@ -28,7 +29,7 @@ class Chart {
         this.y_axis = d3.axisLeft(this.y)
         this.y_axis_g.call(this.y_axis);
 
-        this.reposistion_elements()
+        this.reposistion_elements();
     }
 
     reposistion_elements() {
@@ -57,6 +58,18 @@ class Chart {
         this.y_axis_g.call(this.y_axis);
 
     }
+
+    add_curve(data) {
+
+    }
+
+}
+
+class ChartCurve {
+    constructor() {
+        this.data = [];
+    }
+
 
 }
 
