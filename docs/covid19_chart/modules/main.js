@@ -86,9 +86,10 @@ let prep_data = () => {
                         date: new Date(cc[i][0])
                     };
                 }
-                prepped.dates[cc[i][0]][e] = cc[i][1];
-                prepped.dates[cc[i][0]]['delta_' + e] = cc[i][1] - last_cc;
-                last_cc = cc[i][1];
+                let n = Number(cc[i][1]);
+                prepped.dates[cc[i][0]][e] = n;
+                prepped.dates[cc[i][0]]['delta_' + e] = n - last_cc;
+                last_cc = n;
             }
         })
 
@@ -111,5 +112,9 @@ window.addEventListener("resize", redraw);
 redraw();
 
 let draw_chart = () => {
-    chart.add_curve('Nederland', data.prepped['Netherlands'].array, 'date', 'date', 'confirmed')
+    chart.add_curve('Nederlandc', data.prepped['Netherlands'].array, 'date', 'date', 'confirmed');
+    chart.add_curve('Spainc', data.prepped['Spain'].array, 'date', 'date', 'confirmed');
+
+
+    chart.adjust();
 }

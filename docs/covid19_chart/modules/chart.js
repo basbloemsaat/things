@@ -32,6 +32,7 @@ class Chart {
         this.reposistion_elements();
     }
 
+    // makes the chart fit the svg
     reposistion_elements() {
         let x_height = this.x_axis_g.node().getBBox()['height'];
         let y_width = this.y_axis_g.node().getBBox()['width'];
@@ -57,6 +58,52 @@ class Chart {
         this.y.range([0, canvas_height]);
         this.y_axis_g.call(this.y_axis);
 
+        this.draw_curves()
+    }
+
+    // makes the axis fit the data
+    adjust() {
+        let c = Object.keys(this.curves);
+        if (!c.length) {
+            return;
+        }
+        let cstats = {
+            minx: undefined,
+            maxx: undefined,
+            miny: undefined,
+            maxy: undefined,
+        }
+        for (let i = 0; i < c.length; i++) {
+            let stats = this.curves[c[i]].stats;
+
+            if (cstats.minx === undefined || cstats.minx > stats.minx) {
+                cstats.minx = stats.minx;
+            }
+            if (cstats.maxx === undefined || cstats.maxx < stats.maxx) {
+                cstats.maxx = stats.maxx;
+            }
+            if (cstats.miny === undefined || cstats.miny > stats.miny) {
+                cstats.miny = stats.miny;
+            }
+            if (cstats.maxy === undefined || cstats.maxy < stats.maxy) {
+                cstats.maxy = stats.maxy;
+            }
+        }
+
+        this.x.domain([cstats.minx, cstats.maxx])
+        this.x_axis_g.call(this.x_axis);
+
+        this.y.domain([cstats.maxy, cstats.miny])
+        this.y_axis_g.call(this.y_axis);
+
+        this.draw_curves()
+    }
+
+    draw_curves() {
+        let c = Object.keys(this.curves);
+        for (let i = 0; i < c.length; i++) {
+            this.curves[c[i]].draw(this.x, this.y);
+        }
     }
 
     add_curve(name = '', data = [], id = '', x = '', y = '') {
@@ -64,6 +111,8 @@ class Chart {
         this.curves[name] = new ChartCurve(g, data, id, x, y);
         this.curves[name].draw(this.x, this.y);
     }
+
+
 }
 
 class ChartCurve {
@@ -76,16 +125,66 @@ class ChartCurve {
     }
 
     draw(fx, fy) {
-        let x = this.x;
-        let y = this.y;
-        let id = this.id;
-        let a = this.g.selectAll('circle.dp')
-            .data(this.data, function(d) { return d[id] });
+        let curve = this;
 
-        a.enter().append('circle')
-            .classed('dp', true)
-            .attr('cx', function(d) { return fx(d['date']) })
-            .attr('cy', function(d) { return fy(d['confirmed']) })
+        // line
+        let l = this.g.select('path.curve')
+
+        if (l.size() == 0) {
+            l = this.g.append('path').classed('curve', true)
+        }
+
+        l.datum(this.data).attr("d", d3.line()
+            .x(function(d) { return fx(d[curve.x]) })
+            .y(function(d) { return fy(d[curve.y]) })
+        )
+
+
+
+
+        //points
+        let a = this.g.selectAll('circle.curve_point')
+            .data(this.data, function(d) { return d[curve.id] });
+
+        a.exit().remove();
+
+        let newa = a.enter().append('circle')
+            .classed('curve_point', true)
+
+        a.merge(newa)
+            .attr('cx', function(d) { return fx(d[curve.x]) })
+            .attr('cy', function(d) { return fy(d[curve.y]) })
+    }
+
+    // todo: get stats based on data and settings
+    get stats() {
+        let stats = {
+            minx: undefined,
+            maxx: undefined,
+            miny: undefined,
+            maxy: undefined,
+        };
+
+        for (let i = 0; i < this.data.length; i++) {
+            let d = this.data[i];
+
+            if (stats.minx === undefined || stats.minx > d[this.x]) {
+                stats.minx = d[this.x];
+            }
+            if (stats.maxx === undefined || stats.maxx < d[this.x]) {
+                stats.maxx = d[this.x];
+            }
+            if (stats.miny === undefined || stats.miny > d[this.y]) {
+                stats.miny = d[this.y];
+            }
+            if (stats.maxy === undefined || stats.maxy < d[this.y]) {
+                stats.maxy = d[this.y];
+            }
+
+
+        }
+
+        return stats;
     }
 }
 

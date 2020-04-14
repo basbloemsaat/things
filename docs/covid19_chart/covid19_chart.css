@@ -21,9 +21,16 @@ svg#chart {
     height: 100%;
 }
 
-circle.dp {
-    r: 2;
+circle.curve_point {
+    r: 1.5;
     fill: white;
     stroke: black;
     stroke-width: 1;
+}
+
+path.curve {
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5;
+    opacity: 0.3
 }
