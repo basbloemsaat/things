@@ -5,7 +5,7 @@ import { Chart } from './chart.js';
 
 let svg = d3.select('svg#chart');
 
-var chart = new Chart(svg);
+var chart = new Chart(svg, 'date', 'confirmed');
 
 let data = {
     confirmed: {},
@@ -69,8 +69,8 @@ let prep_data = () => {
             recovered: (data.recovered[key] || [])[0] || {},
         }
 
-        prepped['Country/Region'] = d.confirmed['Country/Region'] || d.deaths['Country/Region'] || d.recovered['Country/Region']
-        prepped['Province/State'] = d.confirmed['Province/State'] || d.deaths['Province/State'] || d.recovered['Province/State']
+        prepped['Country/Region'] = d.confirmed['Country/Region'] || d.deaths['Country/Region'] || d.recovered['Country/Region'];
+        prepped['Province/State'] = d.confirmed['Province/State'] || d.deaths['Province/State'] || d.recovered['Province/State'];
 
 
         let x = ['confirmed', 'deaths', 'recovered'];
@@ -97,7 +97,6 @@ let prep_data = () => {
 
         data.prepped[key] = prepped;
     }
-
 }
 
 let redraw = () => {
@@ -112,9 +111,20 @@ window.addEventListener("resize", redraw);
 redraw();
 
 let draw_chart = () => {
-    chart.add_curve('Nederlandc', data.prepped['Netherlands'].array, 'date', 'date', 'confirmed');
-    chart.add_curve('Spainc', data.prepped['Spain'].array, 'date', 'date', 'confirmed');
-
+    chart.add_curve('Nederlandc', data.prepped['Netherlands'].array, 'date');
+    chart.add_curve('Spainc', data.prepped['Spain'].array, 'date');
 
     chart.adjust();
 }
+
+let test = () => {
+    // console.log('test')
+
+    // switch getoonde variabele
+    chart.y = 'deaths';
+
+
+}
+window.setTimeout(function() { test() }, 2000);
+
+d3.select('button#test').on('click', test)

@@ -5,10 +5,12 @@ let config = {
 }
 
 class Chart {
-    constructor(svg) {
+    constructor(svg, x = 'x', y = 'y') {
         this.svg = svg;
         this.curves = {};
 
+        this._x = x;
+        this._y = y;
 
         let g = this.g = svg.append('g')
         this.canvas = g.append('g').classed('canvas', true);
@@ -17,16 +19,16 @@ class Chart {
 
 
         // default scales, used for sizing
-        this.x = d3.scaleTime()
+        this.fx = d3.scaleTime()
             .domain([new Date(2019, 11, 31), new Date()])
             .range([0, 100])
-        this.x_axis = d3.axisBottom(this.x)
+        this.x_axis = d3.axisBottom(this.fx)
         this.x_axis_g.call(this.x_axis);
 
-        this.y = d3.scaleLinear()
+        this.fy = d3.scaleLinear()
             .domain([40000, 1])
             .range([0, 100])
-        this.y_axis = d3.axisLeft(this.y)
+        this.y_axis = d3.axisLeft(this.fy)
         this.y_axis_g.call(this.y_axis);
 
         this.reposistion_elements();
@@ -52,10 +54,10 @@ class Chart {
         this.canvas
             .attr('transform', 'translate(' + (y_width + config.padding) + ',' + config.padding + ')')
 
-        this.x.range([0, canvas_width]);
+        this.fx.range([0, canvas_width]);
         this.x_axis_g.call(this.x_axis);
 
-        this.y.range([0, canvas_height]);
+        this.fy.range([0, canvas_height]);
         this.y_axis_g.call(this.y_axis);
 
         this.draw_curves()
@@ -90,10 +92,10 @@ class Chart {
             }
         }
 
-        this.x.domain([cstats.minx, cstats.maxx])
+        this.fx.domain([cstats.minx, cstats.maxx])
         this.x_axis_g.call(this.x_axis);
 
-        this.y.domain([cstats.maxy, cstats.miny])
+        this.fy.domain([cstats.maxy, cstats.miny])
         this.y_axis_g.call(this.y_axis);
 
         this.draw_curves()
@@ -102,26 +104,52 @@ class Chart {
     draw_curves() {
         let c = Object.keys(this.curves);
         for (let i = 0; i < c.length; i++) {
-            this.curves[c[i]].draw(this.x, this.y);
+            this.curves[c[i]].draw(this.fx, this.fy);
         }
     }
 
-    add_curve(name = '', data = [], id = '', x = '', y = '') {
+    add_curve(name = '', data = [], id = '') {
         let g = this.canvas.append('g').classed(name, true);
-        this.curves[name] = new ChartCurve(g, data, id, x, y);
-        this.curves[name].draw(this.x, this.y);
+        this.curves[name] = new ChartCurve(g, data, id, this._x, this._y);
+        this.curves[name].draw(this.fx, this.fy);
+    }
+
+    set x(value) {
+        this._x = value;
+        for (let key in this.curves) {
+            this.curves[key].x = value;
+        }
+
+        this.draw_curves();
+    }
+
+    set y(value) {
+        this._y = value;
+        for (let key in this.curves) {
+            this.curves[key].y = value;
+        }
+
+        this.adjust();
     }
 
 
 }
 
 class ChartCurve {
-    constructor(g = undefined, data = [], id = '', x = '', y = '', ) {
+    constructor(g = undefined, data = [], id = '', x = '', y = '') {
         this.data = data;
         this.id = id;
-        this.x = x;
-        this.y = y;
+        this._x = x;
+        this._y = y;
         this.g = g;
+    }
+
+    set x(value) {
+        this._x = value;
+    }
+
+    set y(value) {
+        this._y = value;
     }
 
     draw(fx, fy) {
@@ -135,12 +163,9 @@ class ChartCurve {
         }
 
         l.datum(this.data).attr("d", d3.line()
-            .x(function(d) { return fx(d[curve.x]) })
-            .y(function(d) { return fy(d[curve.y]) })
+            .x(function(d) { return fx(d[curve._x]) })
+            .y(function(d) { return fy(d[curve._y]) })
         )
-
-
-
 
         //points
         let a = this.g.selectAll('circle.curve_point')
@@ -152,8 +177,8 @@ class ChartCurve {
             .classed('curve_point', true)
 
         a.merge(newa)
-            .attr('cx', function(d) { return fx(d[curve.x]) })
-            .attr('cy', function(d) { return fy(d[curve.y]) })
+            .attr('cx', function(d) { return fx(d[curve._x]) })
+            .attr('cy', function(d) { return fy(d[curve._y]) })
     }
 
     // todo: get stats based on data and settings
@@ -168,20 +193,18 @@ class ChartCurve {
         for (let i = 0; i < this.data.length; i++) {
             let d = this.data[i];
 
-            if (stats.minx === undefined || stats.minx > d[this.x]) {
-                stats.minx = d[this.x];
+            if (stats.minx === undefined || stats.minx > d[this._x]) {
+                stats.minx = d[this._x];
             }
-            if (stats.maxx === undefined || stats.maxx < d[this.x]) {
-                stats.maxx = d[this.x];
+            if (stats.maxx === undefined || stats.maxx < d[this._x]) {
+                stats.maxx = d[this._x];
             }
-            if (stats.miny === undefined || stats.miny > d[this.y]) {
-                stats.miny = d[this.y];
+            if (stats.miny === undefined || stats.miny > d[this._y]) {
+                stats.miny = d[this._y];
             }
-            if (stats.maxy === undefined || stats.maxy < d[this.y]) {
-                stats.maxy = d[this.y];
+            if (stats.maxy === undefined || stats.maxy < d[this._y]) {
+                stats.maxy = d[this._y];
             }
-
-
         }
 
         return stats;
