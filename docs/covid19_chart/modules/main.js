@@ -38,8 +38,6 @@ Promise.all([
             })
         .object(files[2]);
 
-    console.log(data.prepped)
-
     prep_data();
     draw_chart();
 }).catch(function(err) {
@@ -58,7 +56,7 @@ let clone_data_obj = (obj) => {
 }
 
 let prep_data = () => {
-    let unique_keys = [...new Set( Object.keys(data.confirmed), Object.keys(data.deaths), Object.keys(data.recovered))];
+    let unique_keys = [...new Set(Object.keys(data.confirmed), Object.keys(data.deaths), Object.keys(data.recovered))];
 
     for (let i = 0; i < unique_keys.length; i++) {
         let key = unique_keys[i];
@@ -113,16 +111,5 @@ window.addEventListener("resize", redraw);
 redraw();
 
 let draw_chart = () => {
-    console.log(data.prepped['Netherlands']);
-
-    points['Netherlands'] = chart.canvas.append('g').classed('Netherlands', true);
-    let a = points['Netherlands'].selectAll('circle.dp')
-        .data(data.prepped['Netherlands'].array, function(d) { return d['date'] });
-    a.enter().append('circle')
-        .classed('dp', true)
-        .attr('cx', function(d) { return chart.x(d['date']) })
-        .attr('cy', function(d) { return chart.y(d['confirmed']) })
-
-    console.log(chart.y)
-
+    chart.add_curve('Nederland', data.prepped['Netherlands'].array, 'date', 'date', 'confirmed')
 }

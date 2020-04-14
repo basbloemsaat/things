@@ -7,7 +7,7 @@ let config = {
 class Chart {
     constructor(svg) {
         this.svg = svg;
-        this.curves = [];
+        this.curves = {};
 
 
         let g = this.g = svg.append('g')
@@ -24,7 +24,7 @@ class Chart {
         this.x_axis_g.call(this.x_axis);
 
         this.y = d3.scaleLinear()
-            .domain([40000, 0])
+            .domain([40000, 1])
             .range([0, 100])
         this.y_axis = d3.axisLeft(this.y)
         this.y_axis_g.call(this.y_axis);
@@ -44,12 +44,12 @@ class Chart {
 
 
         this.x_axis_g
-            .attr('transform', 'translate(' + (y_width+config.padding) + ',' + (canvas_height + config.padding) + ')')
+            .attr('transform', 'translate(' + (y_width + config.padding) + ',' + (canvas_height + config.padding) + ')')
         this.y_axis_g
-            .attr('transform', 'translate(' + (y_width+config.padding) + ',' + config.padding + ')')
+            .attr('transform', 'translate(' + (y_width + config.padding) + ',' + config.padding + ')')
 
         this.canvas
-            .attr('transform', 'translate(' + (y_width+config.padding) + ',' + config.padding + ')')
+            .attr('transform', 'translate(' + (y_width + config.padding) + ',' + config.padding + ')')
 
         this.x.range([0, canvas_width]);
         this.x_axis_g.call(this.x_axis);
@@ -59,18 +59,34 @@ class Chart {
 
     }
 
-    add_curve(data) {
-
+    add_curve(name = '', data = [], id = '', x = '', y = '') {
+        let g = this.canvas.append('g').classed(name, true);
+        this.curves[name] = new ChartCurve(g, data, id, x, y);
+        this.curves[name].draw(this.x, this.y);
     }
-
 }
 
 class ChartCurve {
-    constructor() {
-        this.data = [];
+    constructor(g = undefined, data = [], id = '', x = '', y = '', ) {
+        this.data = data;
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.g = g;
     }
 
+    draw(fx, fy) {
+        let x = this.x;
+        let y = this.y;
+        let id = this.id;
+        let a = this.g.selectAll('circle.dp')
+            .data(this.data, function(d) { return d[id] });
 
+        a.enter().append('circle')
+            .classed('dp', true)
+            .attr('cx', function(d) { return fx(d['date']) })
+            .attr('cy', function(d) { return fy(d['confirmed']) })
+    }
 }
 
 export { Chart };
