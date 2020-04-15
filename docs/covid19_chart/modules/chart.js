@@ -19,16 +19,16 @@ class Chart {
 
 
         // default scales, used for sizing
-        this.fx = d3.scaleTime()
+        this._fx = d3.scaleTime()
             .domain([new Date(2019, 11, 31), new Date()])
             .range([0, 100])
-        this.x_axis = d3.axisBottom(this.fx)
+        this.x_axis = d3.axisBottom(this._fx)
         this.x_axis_g.call(this.x_axis);
 
-        this.fy = d3.scaleLinear()
+        this._fy = d3.scaleLinear()
             .domain([40000, 1])
             .range([0, 100])
-        this.y_axis = d3.axisLeft(this.fy)
+        this.y_axis = d3.axisLeft(this._fy)
         this.y_axis_g.call(this.y_axis);
 
         this.reposistion_elements();
@@ -54,11 +54,13 @@ class Chart {
         this.canvas
             .attr('transform', 'translate(' + (y_width + config.padding) + ',' + config.padding + ')')
 
-        this.fx.range([0, canvas_width]);
+        this._fx.range([0, canvas_width]);
         this.x_axis_g.call(this.x_axis);
 
-        this.fy.range([0, canvas_height]);
+        this._fy.range([0, canvas_height]);
         this.y_axis_g.call(this.y_axis);
+
+        console.log(this._fy['base']);
 
         this.draw_curves()
     }
@@ -92,10 +94,24 @@ class Chart {
             }
         }
 
-        this.fx.domain([cstats.minx, cstats.maxx])
-        this.x_axis_g.call(this.x_axis);
+        let domain_y = [cstats.maxy, cstats.miny]
 
-        this.fy.domain([cstats.maxy, cstats.miny])
+        if (this._fy['base'] !== undefined) {
+            // hack for 0 in log scales
+            this._fy.clamp(true);
+            if (domain_y[1] <= 0) {
+                domain_y[1] = 0.001;
+            }
+
+            //     console.log(d)
+
+        }
+
+        this._fx.domain([cstats.minx, cstats.maxx])
+        this.x_axis_g.transition().call(this.x_axis);
+
+        // this._fy.domain([cstats.maxy, cstats.miny])
+        this._fy.domain(domain_y)
         this.y_axis_g.call(this.y_axis);
 
         this.draw_curves()
@@ -104,14 +120,14 @@ class Chart {
     draw_curves() {
         let c = Object.keys(this.curves);
         for (let i = 0; i < c.length; i++) {
-            this.curves[c[i]].draw(this.fx, this.fy);
+            this.curves[c[i]].draw(this._fx, this._fy);
         }
     }
 
     add_curve(name = '', data = [], id = '') {
         let g = this.canvas.append('g').classed(name, true);
         this.curves[name] = new ChartCurve(g, data, id, this._x, this._y);
-        this.curves[name].draw(this.fx, this.fy);
+        this.curves[name].draw(this._fx, this._fy);
     }
 
     set x(value) {
@@ -120,7 +136,7 @@ class Chart {
             this.curves[key].x = value;
         }
 
-        this.draw_curves();
+        this.adjust();
     }
 
     set y(value) {
@@ -132,7 +148,40 @@ class Chart {
         this.adjust();
     }
 
+    _prep_scale(scale, source) {
+        let d = source.domain();
+        console.log(d);
 
+
+        scale.domain(d);
+        scale.clamp(true);
+        scale.range(source.range());
+
+        window.xyz = scale;
+
+        return scale;
+    }
+
+    fx(scale, x) {
+        this._fx = this._prep_scale(scale, this._fx);
+        this.x_axis = d3.axisBottom(this._fx)
+        this.adjust();
+        if (x !== undefined) {
+            this.x = x;
+        } else {
+            this.adjust();
+        }
+    }
+
+    fy(scale, y) {
+        this._fy = this._prep_scale(scale, this._fy);
+        this.y_axis = d3.axisLeft(this._fy)
+        if (y !== undefined) {
+            this.y = y;
+        } else {
+            this.adjust();
+        }
+    }
 }
 
 class ChartCurve {
@@ -157,12 +206,14 @@ class ChartCurve {
 
         // line
         let l = this.g.select('path.curve')
+        let duration = 400;
 
         if (l.size() == 0) {
             l = this.g.append('path').classed('curve', true)
+            duration = 0;
         }
 
-        l.datum(this.data).attr("d", d3.line()
+        l.datum(this.data).transition().duration(duration).attr("d", d3.line()
             .x(function(d) { return fx(d[curve._x]) })
             .y(function(d) { return fy(d[curve._y]) })
         )
@@ -176,7 +227,7 @@ class ChartCurve {
         let newa = a.enter().append('circle')
             .classed('curve_point', true)
 
-        a.merge(newa)
+        a.merge(newa).transition().duration(duration)
             .attr('cx', function(d) { return fx(d[curve._x]) })
             .attr('cy', function(d) { return fy(d[curve._y]) })
     }

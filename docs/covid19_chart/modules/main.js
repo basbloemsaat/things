@@ -121,7 +121,14 @@ let test = () => {
     // console.log('test')
 
     // switch getoonde variabele
-    chart.y = 'deaths';
+    // chart.y = 'deaths';
+    chart.fy(d3.scaleLog());
+
+
+    // let xy = d3.scaleLog().clamp(true);
+
+    // console.log(xy['base']);
+
 
 
 }
