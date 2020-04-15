@@ -30,7 +30,7 @@ circle.curve_point {
 
 path.curve {
     fill: none;
-    stroke: black;
+    stroke: cornflowerblue;
     stroke-width: 1.5;
-    opacity: 0.3
+    opacity: 1
 }

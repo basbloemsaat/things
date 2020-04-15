@@ -94,24 +94,36 @@ class Chart {
             }
         }
 
+        let domain_x = [cstats.minx, cstats.maxx]
         let domain_y = [cstats.maxy, cstats.miny]
+
+        if (this._fx['base'] !== undefined) {
+            // hack for 0 in log scales
+            this._fx.clamp(true);
+            if (domain_x[0] <= 0) {
+                domain_x[0] = 1;
+            }
+            if (domain_x[1] <= 0) {
+                domain_x[1] = 1;
+            }
+        }
 
         if (this._fy['base'] !== undefined) {
             // hack for 0 in log scales
             this._fy.clamp(true);
-            if (domain_y[1] <= 0) {
-                domain_y[1] = 0.001;
+            if (domain_y[0] <= 0) {
+                domain_y[0] = 1;
             }
-
-            //     console.log(d)
-
+            if (domain_y[1] <= 0) {
+                domain_y[1] = 1;
+            }
         }
 
-        this._fx.domain([cstats.minx, cstats.maxx])
+        this._fx.domain(domain_x);
         this.x_axis_g.transition().call(this.x_axis);
 
         // this._fy.domain([cstats.maxy, cstats.miny])
-        this._fy.domain(domain_y)
+        this._fy.domain(domain_y);
         this.y_axis_g.call(this.y_axis);
 
         this.draw_curves()
@@ -157,7 +169,6 @@ class Chart {
         scale.clamp(true);
         scale.range(source.range());
 
-        window.xyz = scale;
 
         return scale;
     }
@@ -166,6 +177,7 @@ class Chart {
         this._fx = this._prep_scale(scale, this._fx);
         this.x_axis = d3.axisBottom(this._fx)
         this.adjust();
+        window.xyz = scale;
         if (x !== undefined) {
             this.x = x;
         } else {

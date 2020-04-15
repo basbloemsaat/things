@@ -123,6 +123,7 @@ let test = () => {
     // switch getoonde variabele
     // chart.y = 'deaths';
     chart.fy(d3.scaleLog());
+    chart.fx(d3.scaleLog(), 'deaths');
 
 
     // let xy = d3.scaleLog().clamp(true);
