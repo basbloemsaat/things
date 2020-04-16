@@ -111,8 +111,11 @@ window.addEventListener("resize", redraw);
 redraw();
 
 let draw_chart = () => {
-    chart.add_curve('Nederlandc', data.prepped['Netherlands'].array, 'date');
-    chart.add_curve('Spainc', data.prepped['Spain'].array, 'date');
+    chart.add_curve('Nederland', data.prepped['Netherlands'].array, 'date', { color: "red" });
+    chart.add_curve('Spanje', data.prepped['Spain'].array, 'date');
+
+    chart.add_legend('Nederland', 'green');
+    chart.add_legend('Spanje', 'blue');
 
     chart.adjust();
 }
@@ -122,8 +125,8 @@ let test = () => {
 
     // switch getoonde variabele
     // chart.y = 'deaths';
-    chart.fy(d3.scaleLog());
-    chart.fx(d3.scaleLog(), 'deaths');
+    // chart.fy(d3.scaleLog());
+    // chart.fx(d3.scaleLog(), 'deaths');
 
 
     // let xy = d3.scaleLog().clamp(true);

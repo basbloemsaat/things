@@ -14,6 +14,7 @@ class Chart {
 
         let g = this.g = svg.append('g')
         this.canvas = g.append('g').classed('canvas', true);
+        this.legend = this.canvas.append('g').classed('legend', true).attr('transform', 'translate(' + config.padding + ',' + config.padding + ')');
         this.x_axis_g = g.append('g').classed('xaxis', true);
         this.y_axis_g = g.append('g').classed('yaxis', true);
 
@@ -32,6 +33,8 @@ class Chart {
         this.y_axis_g.call(this.y_axis);
 
         this.reposistion_elements();
+
+        this._legend = [];
     }
 
     // makes the chart fit the svg
@@ -59,8 +62,6 @@ class Chart {
 
         this._fy.range([0, canvas_height]);
         this.y_axis_g.call(this.y_axis);
-
-        console.log(this._fy['base']);
 
         this.draw_curves()
     }
@@ -136,10 +137,14 @@ class Chart {
         }
     }
 
-    add_curve(name = '', data = [], id = '') {
+    add_curve(name = '', data = [], id = '', options = {}) {
         let g = this.canvas.append('g').classed(name, true);
-        this.curves[name] = new ChartCurve(g, data, id, this._x, this._y);
-        this.curves[name].draw(this._fx, this._fy);
+        let curve = this.curves[name] = new ChartCurve(g, data, id, this._x, this._y, options);
+        curve.draw(this._fx, this._fy);
+    }
+
+    add_legend(text = '', color = '') {
+        this._legend.push({ text: text, color: color });
     }
 
     set x(value) {
@@ -197,12 +202,20 @@ class Chart {
 }
 
 class ChartCurve {
-    constructor(g = undefined, data = [], id = '', x = '', y = '') {
+    constructor(g = undefined, data = [], id = '', x = '', y = '', options = {}) {
         this.data = data;
         this.id = id;
         this._x = x;
         this._y = y;
         this.g = g;
+
+        this.color = '#000000';
+        this.opacity = 1;
+
+        if (options['color']) {
+            this.color = options['color'];
+        }
+
     }
 
     set x(value) {
@@ -221,7 +234,9 @@ class ChartCurve {
         let duration = 400;
 
         if (l.size() == 0) {
-            l = this.g.append('path').classed('curve', true)
+            l = this.g.append('path')
+                .classed('curve', true)
+                .style('stroke', this.color);
             duration = 0;
         }
 
@@ -230,6 +245,7 @@ class ChartCurve {
             .y(function(d) { return fy(d[curve._y]) })
         )
 
+        console.log(this.color)
         //points
         let a = this.g.selectAll('circle.curve_point')
             .data(this.data, function(d) { return d[curve.id] });
@@ -238,6 +254,7 @@ class ChartCurve {
 
         let newa = a.enter().append('circle')
             .classed('curve_point', true)
+            .style('stroke', this.color);
 
         a.merge(newa).transition().duration(duration)
             .attr('cx', function(d) { return fx(d[curve._x]) })
