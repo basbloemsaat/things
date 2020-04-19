@@ -2,6 +2,7 @@ import 'https://d3js.org/d3.v5.js';
 
 let config = {
     padding: 10,
+    transition_duration: 250,
 }
 
 class Chart {
@@ -67,7 +68,7 @@ class Chart {
     }
 
     // makes the axis fit the data
-    adjust() {
+    adjust(notransition = false) {
         let c = Object.keys(this.curves);
         if (!c.length) {
             return;
@@ -121,19 +122,19 @@ class Chart {
         }
 
         this._fx.domain(domain_x);
-        this.x_axis_g.transition().call(this.x_axis);
+        this.x_axis_g.transition().duration(notransition ? 0 : config.transition_duration).call(this.x_axis);
 
         // this._fy.domain([cstats.maxy, cstats.miny])
         this._fy.domain(domain_y);
         this.y_axis_g.call(this.y_axis);
 
-        this.draw_curves()
+        this.draw_curves(notransition)
     }
 
-    draw_curves() {
+    draw_curves(notransition = false) {
         let c = Object.keys(this.curves);
         for (let i = 0; i < c.length; i++) {
-            this.curves[c[i]].draw(this._fx, this._fy);
+            this.curves[c[i]].draw(this._fx, this._fy, notransition);
         }
     }
 
@@ -167,8 +168,6 @@ class Chart {
 
     _prep_scale(scale, source) {
         let d = source.domain();
-        console.log(d);
-
 
         scale.domain(d);
         scale.clamp(true);
@@ -226,26 +225,24 @@ class ChartCurve {
         this._y = value;
     }
 
-    draw(fx, fy) {
+    draw(fx, fy, notransition = false) {
         let curve = this;
 
         // line
         let l = this.g.select('path.curve')
-        let duration = 400;
 
         if (l.size() == 0) {
             l = this.g.append('path')
                 .classed('curve', true)
                 .style('stroke', this.color);
-            duration = 0;
+            notransition = true;
         }
 
-        l.datum(this.data).transition().duration(duration).attr("d", d3.line()
+        l.datum(this.data).transition().duration(notransition ? 0 : config.transition_duration).attr("d", d3.line()
             .x(function(d) { return fx(d[curve._x]) })
             .y(function(d) { return fy(d[curve._y]) })
         )
 
-        console.log(this.color)
         //points
         let a = this.g.selectAll('circle.curve_point')
             .data(this.data, function(d) { return d[curve.id] });
@@ -256,7 +253,7 @@ class ChartCurve {
             .classed('curve_point', true)
             .style('stroke', this.color);
 
-        a.merge(newa).transition().duration(duration)
+        a.merge(newa).transition().duration(notransition ? 0 : config.transition_duration)
             .attr('cx', function(d) { return fx(d[curve._x]) })
             .attr('cy', function(d) { return fy(d[curve._y]) })
     }
