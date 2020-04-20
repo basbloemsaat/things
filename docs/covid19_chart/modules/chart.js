@@ -1,7 +1,7 @@
 import 'https://d3js.org/d3.v5.js';
 
 let config = {
-    padding: 10,
+    padding: 20,
     transition_duration: 250,
 }
 
@@ -59,10 +59,10 @@ class Chart {
             .attr('transform', 'translate(' + (y_width + config.padding) + ',' + config.padding + ')')
 
         this._fx.range([0, canvas_width]);
-        this.x_axis_g.call(this.x_axis);
+        this.x_axis_g.transition().call(this.x_axis);
 
         this._fy.range([0, canvas_height]);
-        this.y_axis_g.call(this.y_axis);
+        this.y_axis_g.transition().call(this.y_axis);
 
         this.draw_curves()
     }

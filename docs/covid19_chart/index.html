@@ -10,7 +10,37 @@
 <body>
     <div id="container">
         <div id="chart_options">
-            options <button id="test" style="float:right">test</button>
+            <div id="yaxis_options" class="column">
+                y-axis:
+                <select id="yaxis_var">
+                    <option value="confirmed">confirmed cases</option>
+                    <option value="confirmed_pm">confirmed cases per million inhabitants</option>
+                    <option value="delta_confirmed">new confirmed cases</option>
+                    <option value="delta_confirmed_pm" selected>new confirmed cases per million inhabitants</option>
+                    <option value="deaths">deaths</option>
+                    <option value="deaths_pm">deaths per million inhabitants</option>
+                    <option value="delta_deaths">new deaths</option>
+                    <option value="delta_deaths_pm">new deaths per million inhabitants</option>
+                </select>
+                <label for="yaxis_log">logaritmic: </label>
+                <input type="checkbox" name="yaxis_log" id="yaxis_log" checked>
+            </div>
+            <div id="xaxis_options" class="column">
+                x-axis:
+                <select id="xaxis_var">
+                    <option value="date">date</option>
+                    <option value="confirmed">confirmed cases</option>
+                    <option value="confirmed_pm" selected>confirmed cases per million inhabitants</option>
+                    <option value="delta_confirmed">new confirmed cases</option>
+                    <option value="delta_confirmed_pm">new confirmed cases per million inhabitants</option>
+                    <option value="deaths">deaths</option>
+                    <option value="deaths_pm">deaths per million inhabitants</option>
+                    <option value="delta_deaths">new deaths</option>
+                    <option value="delta_deaths_pm">new deaths per million inhabitants</option>
+                </select>
+                <label for="xaxis_log">logaritmic: </label>
+                <input type="checkbox" name="xaxis_log" id="xaxis_log" checked>
+            </div>
         </div>
         <div id="chart_base"><svg id="chart"></svg></div>
     </div>

@@ -4,6 +4,13 @@ div#container {
     flex-direction: column;
 }
 
+div#chart_options {
+    display: flex;
+}
+
+div.column {
+  flex: 50%;
+}
 
 div#chart_base,
 svg {

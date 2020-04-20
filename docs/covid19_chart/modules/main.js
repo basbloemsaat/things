@@ -15,6 +15,70 @@ let data = {
     prepped: {},
 }
 
+let xlog = d3.select('input#xaxis_log');
+let ylog = d3.select('input#yaxis_log');
+let xvar = d3.select('select#xaxis_var').node();
+let yvar = d3.select('select#yaxis_var').node();
+xlog.attr('disabled', true);
+
+let input_state = {
+    x: 'date',
+    fx: 'Date',
+    y: 'confirmed',
+    fy: 'Linear',
+}
+
+// functie om de chartvariabelen en assen goed te zetten;
+var set_chart_variables = () => {
+    if (xvar.value != input_state.x) {
+        input_state.x = xvar.value;
+        chart.x = input_state.x;
+
+        if (input_state.x == 'date') {
+            input_state.fx = 'Date';
+            chart.fx(d3.scaleTime())
+            xlog.property('checked', false);
+            xlog.property('disabled', true);
+        } else {
+            input_state.fx = 'Change';
+            xlog.property('disabled', false);
+        }
+    }
+
+    if (xlog.property('checked') && input_state.fx != 'Log' && input_state.fx != 'Date') {
+        // set x logaritmic
+        chart.fx(d3.scaleLog());
+        input_state.fx = 'Log'
+    } else if (!xlog.property('checked') && input_state.fx != 'Linear' && input_state.fx != 'Date') {
+        // set x linear
+        console.log(' x lin ');
+
+        chart.fx(d3.scaleLinear());
+        input_state.fx = 'Linear'
+    }
+
+    if (yvar.value != input_state.y) {
+        input_state.y = yvar.value
+        chart.y = input_state.y
+    }
+    if (ylog.property('checked') && input_state.fy != 'Log') {
+        // set y logaritmic
+        chart.fy(d3.scaleLog());
+        input_state.fy = 'Log'
+    } else if (!ylog.property('checked') && input_state.fy != 'Linear') {
+        // set y linear
+        chart.fy(d3.scaleLinear());
+        input_state.fy = 'Linear'
+    }
+}
+
+set_chart_variables()
+
+
+d3.selectAll('input').on('change', set_chart_variables)
+d3.selectAll('select').on('change', set_chart_variables)
+
+
 Promise.all([
     d3.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"),
     d3.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"),
@@ -46,7 +110,7 @@ Promise.all([
             function(d) {
                 return d['Country (or dependent territory)']
             })
-        .object(files[3]);  
+        .object(files[3]);
     prep_data();
     draw_chart();
 }).catch(function(err) {
@@ -69,7 +133,7 @@ let prep_data = () => {
 
     for (let i = 0; i < unique_keys.length; i++) {
         let key = unique_keys[i];
-        let pop = data['population'][key] ? data['population'][key][0]:{};
+        let pop = data['population'][key] ? data['population'][key][0] : {};
 
         let prepped = {
             dates: {},
@@ -107,6 +171,25 @@ let prep_data = () => {
 
         prepped['array'] = Object.values(prepped.dates);
 
+        // another loop, not very efficient
+        for (let i = 0; i < prepped['array'].length; i++) {
+            let current = prepped['array'][i];
+            // console.log(current);
+            let pm = pop['Population'] / 1000000;
+            // console.log(pm);
+
+            let x = ['confirmed', 'deaths', 'delta_confirmed', 'delta_deaths', 'delta_recovered', 'recovered', ]
+            x.forEach((e) => {
+                if (pm) {
+                    current[e + '_pm'] = current[e] / pm;
+                } else {
+                    current[e + '_pm'] = 0;
+                }
+            })
+        }
+
+
+
         data.prepped[key] = prepped;
     }
 }
@@ -126,7 +209,7 @@ let draw_chart = () => {
     chart.add_curve('Spanje', data.prepped['Spain'].array, 'date');
     chart.add_curve('Nederland', data.prepped['Netherlands'].array, 'date', { color: "red" });
 
-    chart.add_legend('Nederland', 'green');
+    // chart.add_legend('Nederland', 'green');
     // chart.add_legend('Spanje', 'blue');
 
     chart.adjust(true);
@@ -143,7 +226,7 @@ let test = () => {
 
     // console.log(xy['base']);
 
-    console.log(data);
+    // console.log(data.prepped['Netherlands']);
 
 }
 window.setTimeout(function() { test() }, 2000);
