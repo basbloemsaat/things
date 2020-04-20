@@ -18,6 +18,7 @@ Promise.all([
     d3.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"),
     d3.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"),
     d3.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv"),
+    // d3.csv("https://raw.githubusercontent.com/basbloemsaat/datasets/master/demographics/Countries%20and%20areas%20ranked%20by%20population%20in%202019.csv"),
 ]).then(function(files) {
     data.confirmed = d3.nest()
         .key(
@@ -114,7 +115,7 @@ let draw_chart = () => {
     chart.add_curve('Spanje', data.prepped['Spain'].array, 'date');
     chart.add_curve('Nederland', data.prepped['Netherlands'].array, 'date', { color: "red" });
 
-    // chart.add_legend('Nederland', 'green');
+    chart.add_legend('Nederland', 'green');
     // chart.add_legend('Spanje', 'blue');
 
     chart.adjust(true);
