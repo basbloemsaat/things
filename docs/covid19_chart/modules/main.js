@@ -11,6 +11,7 @@ let data = {
     confirmed: {},
     deaths: {},
     recovered: {},
+    population: {},
     prepped: {},
 }
 
@@ -18,7 +19,7 @@ Promise.all([
     d3.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"),
     d3.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"),
     d3.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv"),
-    // d3.csv("https://raw.githubusercontent.com/basbloemsaat/datasets/master/demographics/Countries%20and%20areas%20ranked%20by%20population%20in%202019.csv"),
+    d3.csv("https://raw.githubusercontent.com/basbloemsaat/datasets/master/demographics/Countries%20and%20areas%20ranked%20by%20population%20in%202019.csv"),
 ]).then(function(files) {
     data.confirmed = d3.nest()
         .key(
@@ -39,6 +40,13 @@ Promise.all([
             })
         .object(files[2]);
 
+
+    data.population = d3.nest()
+        .key(
+            function(d) {
+                return d['Country (or dependent territory)']
+            })
+        .object(files[3]);  
     prep_data();
     draw_chart();
 }).catch(function(err) {
@@ -61,8 +69,11 @@ let prep_data = () => {
 
     for (let i = 0; i < unique_keys.length; i++) {
         let key = unique_keys[i];
+        let pop = data['population'][key] ? data['population'][key][0]:{};
+
         let prepped = {
             dates: {},
+            population: pop,
         };
         let d = {
             confirmed: (data.confirmed[key] || [])[0] || {},
@@ -122,8 +133,6 @@ let draw_chart = () => {
 }
 
 let test = () => {
-    // console.log('test')
-
     // switch getoonde variabele
     // chart.y = 'deaths';
     // chart.fy(d3.scaleLog());
@@ -134,7 +143,7 @@ let test = () => {
 
     // console.log(xy['base']);
 
-
+    console.log(data);
 
 }
 window.setTimeout(function() { test() }, 2000);
