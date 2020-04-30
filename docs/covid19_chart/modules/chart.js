@@ -100,6 +100,9 @@ class Chart {
         let domain_x = [cstats.minx, cstats.maxx]
         let domain_y = [cstats.maxy, cstats.miny]
 
+        console.log('xyz')
+        window.xyz = this._fx
+
         if (this._fx['base'] !== undefined) {
             // hack for 0 in log scales
             this._fx.clamp(true);
@@ -181,7 +184,7 @@ class Chart {
     fx(scale, x) {
         this._fx = this._prep_scale(scale, this._fx);
         this.x_axis = d3.axisBottom(this._fx)
-            // .tickFormat(d3.format(".0s"))
+        // .tickFormat(d3.format(".0s"))
         if (x !== undefined) {
             this.x = x;
         } else {
@@ -192,7 +195,7 @@ class Chart {
     fy(scale, y) {
         this._fy = this._prep_scale(scale, this._fy);
         this.y_axis = d3.axisLeft(this._fy)
-            // .tickFormat(d3.format(".0s"))
+        // .tickFormat(d3.format(".0s"))
         if (y !== undefined) {
             this.y = y;
         } else {
@@ -242,6 +245,8 @@ class ChartCurve {
         l.datum(this.data).transition().duration(notransition ? 0 : config.transition_duration).attr("d", d3.line()
             .x(function(d) { return fx(d[curve._x]) })
             .y(function(d) { return fy(d[curve._y]) })
+            .curve(d3.curveBundle)
+
         )
 
         //points
