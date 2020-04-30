@@ -15,8 +15,6 @@ let data = {
     prepped: {},
 }
 
-let cum_days = 7;
-
 let xlog = d3.select('input#xaxis_log');
 let ylog = d3.select('input#yaxis_log');
 let xvar = d3.select('select#xaxis_var').node();
@@ -150,6 +148,7 @@ let prep_data = () => {
 
 
         let x = ['confirmed', 'deaths', 'recovered'];
+        let smooth = undefined;
         x.forEach((e) => {
             if (!d[e]) {
                 return;
@@ -164,13 +163,16 @@ let prep_data = () => {
                 }
                 let n = Number(cc[i][1]);
                 prepped.dates[cc[i][0]][e] = n;
+                prepped.dates[cc[i][0]]['smooth_' + e] = n;
                 prepped.dates[cc[i][0]]['delta_' + e] = n - last_cc;
-                prepped.dates[cc[i][0]]['cum_' + e] = n - last_cc;
                 last_cc = n;
             }
-        })
 
+        })
         prepped['array'] = Object.values(prepped.dates);
+        // if (!smooth) {
+        //     smooth = prepped.dates[cc[i][0]];
+        // }
 
         // another loop, not very efficient
         for (let i = 0; i < prepped['array'].length; i++) {

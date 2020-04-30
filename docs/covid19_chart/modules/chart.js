@@ -75,7 +75,7 @@ class Chart {
     // makes the axis fit the data
     adjust(notransition = false) {
         let c = Object.keys(this.curves);
-        let obj = this;
+        const obj = this;
         if (!c.length) {
             return;
         }
