@@ -15,6 +15,8 @@ let data = {
     prepped: {},
 }
 
+let cum_days = 7;
+
 let xlog = d3.select('input#xaxis_log');
 let ylog = d3.select('input#yaxis_log');
 let xvar = d3.select('select#xaxis_var').node();
@@ -165,6 +167,7 @@ let prep_data = () => {
                 let n = Number(cc[i][1]);
                 prepped.dates[cc[i][0]][e] = n;
                 prepped.dates[cc[i][0]]['delta_' + e] = n - last_cc;
+                prepped.dates[cc[i][0]]['cum_' + e] = n - last_cc;
                 last_cc = n;
             }
         })
@@ -192,6 +195,7 @@ let prep_data = () => {
 
         data.prepped[key] = prepped;
     }
+    console.log(data.prepped['Netherlands']);
 }
 
 let redraw = () => {
@@ -226,9 +230,8 @@ let test = () => {
 
     // console.log(xy['base']);
 
-    // console.log(data.prepped['Netherlands']);
 
 }
-window.setTimeout(function() { test() }, 2000);
+window.setTimeout(function() { test() }, 500);
 
-d3.select('button#test').on('click', test)
+// d3.select('button#test').on('click', test)

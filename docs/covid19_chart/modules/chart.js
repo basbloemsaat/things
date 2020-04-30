@@ -25,6 +25,7 @@ class Chart {
             .domain([new Date(2019, 11, 31), new Date()])
             .range([0, 100])
         this.x_axis = d3.axisBottom(this._fx)
+            .tickFormat(d3.format(".0s"))
         this.x_axis_g.call(this.x_axis);
 
         this._fy = d3.scaleLinear()
@@ -180,8 +181,7 @@ class Chart {
     fx(scale, x) {
         this._fx = this._prep_scale(scale, this._fx);
         this.x_axis = d3.axisBottom(this._fx)
-        this.adjust();
-        window.xyz = scale;
+            // .tickFormat(d3.format(".0s"))
         if (x !== undefined) {
             this.x = x;
         } else {
@@ -192,6 +192,7 @@ class Chart {
     fy(scale, y) {
         this._fy = this._prep_scale(scale, this._fy);
         this.y_axis = d3.axisLeft(this._fy)
+            // .tickFormat(d3.format(".0s"))
         if (y !== undefined) {
             this.y = y;
         } else {
