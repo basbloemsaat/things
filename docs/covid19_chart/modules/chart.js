@@ -13,26 +13,30 @@ class Chart {
         this._x = x;
         this._y = y;
 
+        this._scale = {};
+        this._axis = {};
+        this._axisgroups = {};
+
         let g = this.g = svg.append('g')
         this.canvas = g.append('g').classed('canvas', true);
         this.legend = this.canvas.append('g').classed('legend', true).attr('transform', 'translate(' + config.padding + ',' + config.padding + ')');
-        this.x_axis_g = g.append('g').classed('xaxis', true);
-        this.y_axis_g = g.append('g').classed('yaxis', true);
+        this._axisgroups.x = g.append('g').classed('xaxis', true);
+        this._axisgroups.y = g.append('g').classed('yaxis', true);
+
 
 
         // default scales, used for sizing
-        this._fx = d3.scaleTime()
+        this._scale.x = d3.scaleTime()
             .domain([new Date(2019, 11, 31), new Date()])
             .range([0, 100])
-        this.x_axis = d3.axisBottom(this._fx)
-            .tickFormat(d3.format(".0s"))
-        this.x_axis_g.call(this.x_axis);
+        this._axis.x = d3.axisBottom(this._scale.x)
+        this._axisgroups.x.call(this._axis.x);
 
-        this._fy = d3.scaleLinear()
+        this._scale.y = d3.scaleLinear()
             .domain([40000, 1])
             .range([0, 100])
-        this.y_axis = d3.axisLeft(this._fy)
-        this.y_axis_g.call(this.y_axis);
+        this._axis.y = d3.axisLeft(this._scale.y)
+        this._axisgroups.y.call(this._axis.y);
 
         this.reposistion_elements();
 
@@ -41,8 +45,8 @@ class Chart {
 
     // makes the chart fit the svg
     reposistion_elements() {
-        let x_height = this.x_axis_g.node().getBBox()['height'];
-        let y_width = this.y_axis_g.node().getBBox()['width'];
+        let x_height = this._axisgroups.x.node().getBBox()['height'];
+        let y_width = this._axisgroups.y.node().getBBox()['width'];
 
         let svg_height = this.svg.node().clientHeight;
         let svg_width = this.svg.node().clientWidth;
@@ -51,19 +55,19 @@ class Chart {
         let canvas_width = svg_width - y_width - (2 * config.padding);
 
 
-        this.x_axis_g
+        this._axisgroups.x
             .attr('transform', 'translate(' + (y_width + config.padding) + ',' + (canvas_height + config.padding) + ')')
-        this.y_axis_g
+        this._axisgroups.y
             .attr('transform', 'translate(' + (y_width + config.padding) + ',' + config.padding + ')')
 
         this.canvas
             .attr('transform', 'translate(' + (y_width + config.padding) + ',' + config.padding + ')')
 
-        this._fx.range([0, canvas_width]);
-        this.x_axis_g.transition().call(this.x_axis);
+        this._scale.x.range([0, canvas_width]);
+        this._axisgroups.x.transition().call(this._axis.x);
 
-        this._fy.range([0, canvas_height]);
-        this.y_axis_g.transition().call(this.y_axis);
+        this._scale.y.range([0, canvas_height]);
+        this._axisgroups.y.transition().call(this._axis.y);
 
         this.draw_curves()
     }
@@ -71,6 +75,7 @@ class Chart {
     // makes the axis fit the data
     adjust(notransition = false) {
         let c = Object.keys(this.curves);
+        let obj = this;
         if (!c.length) {
             return;
         }
@@ -97,40 +102,43 @@ class Chart {
             }
         }
 
-        let domain_x = [cstats.minx, cstats.maxx]
-        let domain_y = [cstats.maxy, cstats.miny]
+        let domains = {};
+        domains['x'] = [cstats.minx, cstats.maxx]
+        domains['y'] = [cstats.maxy, cstats.miny]
 
-        console.log('xyz')
-        window.xyz = this._fx
+        let adjust_xy = function(xy) {
+            let scale = obj._scale[xy];
+            let domain = domains[xy];
+            let axis = obj._axis[xy];
 
-        if (this._fx['base'] !== undefined) {
-            // hack for 0 in log scales
-            this._fx.clamp(true);
-            if (domain_x[0] <= 0) {
-                domain_x[0] = 1;
+            if (scale.ticks()[0] && typeof(scale.ticks()[0]['toISOString']) === 'function') {
+                //date 
+                scale.clamp(false);
+            } else {
+                if (scale['base'] !== undefined) {
+                    // hack for 0 in log scales
+                    scale.clamp(true);
+                    if (domain[0] <= 0) {
+                        domain[0] = 1;
+                    }
+                    if (domain[1] <= 0) {
+                        domain[1] = 1;
+                    }
+                } else {
+                    scale.clamp(false);
+                }
+                axis.tickFormat(d3.format(".0s"))
             }
-            if (domain_x[1] <= 0) {
-                domain_x[1] = 1;
-            }
+
+            scale.domain(domain);
+            obj._axisgroups[xy]
+                .transition().duration(notransition ? 0 : config.transition_duration)
+                .call(axis);
+
         }
 
-        if (this._fy['base'] !== undefined) {
-            // hack for 0 in log scales
-            this._fy.clamp(true);
-            if (domain_y[0] <= 0) {
-                domain_y[0] = 1;
-            }
-            if (domain_y[1] <= 0) {
-                domain_y[1] = 1;
-            }
-        }
-
-        this._fx.domain(domain_x);
-        this.x_axis_g.transition().duration(notransition ? 0 : config.transition_duration).call(this.x_axis);
-
-        // this._fy.domain([cstats.maxy, cstats.miny])
-        this._fy.domain(domain_y);
-        this.y_axis_g.call(this.y_axis);
+        adjust_xy('x')
+        adjust_xy('y')
 
         this.draw_curves(notransition)
     }
@@ -138,14 +146,14 @@ class Chart {
     draw_curves(notransition = false) {
         let c = Object.keys(this.curves);
         for (let i = 0; i < c.length; i++) {
-            this.curves[c[i]].draw(this._fx, this._fy, notransition);
+            this.curves[c[i]].draw(this._scale.x, this._scale.y, notransition);
         }
     }
 
     add_curve(name = '', data = [], id = '', options = {}) {
         let g = this.canvas.append('g').classed(name, true);
         let curve = this.curves[name] = new ChartCurve(g, data, id, this._x, this._y, options);
-        curve.draw(this._fx, this._fy);
+        curve.draw(this._scale.x, this._scale.y);
     }
 
     add_legend(text = '', color = '') {
@@ -171,36 +179,23 @@ class Chart {
     }
 
     _prep_scale(scale, source) {
-        let d = source.domain();
-
-        scale.domain(d);
-        scale.clamp(true);
+        scale.domain(source.domain());
         scale.range(source.range());
-
+        scale.clamp(true);
 
         return scale;
     }
 
-    fx(scale, x) {
-        this._fx = this._prep_scale(scale, this._fx);
-        this.x_axis = d3.axisBottom(this._fx)
-        // .tickFormat(d3.format(".0s"))
-        if (x !== undefined) {
-            this.x = x;
-        } else {
-            this.adjust();
-        }
+    set fx(scale) {
+        this._scale.x = this._prep_scale(scale, this._scale.x);
+        this._axis.x = d3.axisBottom(this._scale.x)
+        this.adjust();
     }
 
-    fy(scale, y) {
-        this._fy = this._prep_scale(scale, this._fy);
-        this.y_axis = d3.axisLeft(this._fy)
-        // .tickFormat(d3.format(".0s"))
-        if (y !== undefined) {
-            this.y = y;
-        } else {
-            this.adjust();
-        }
+    set fy(scale) {
+        this._scale.y = this._prep_scale(scale, this._scale.y);
+        this._axis.y = d3.axisLeft(this._scale.y)
+        this.adjust();
     }
 }
 
@@ -245,7 +240,7 @@ class ChartCurve {
         l.datum(this.data).transition().duration(notransition ? 0 : config.transition_duration).attr("d", d3.line()
             .x(function(d) { return fx(d[curve._x]) })
             .y(function(d) { return fy(d[curve._y]) })
-            .curve(d3.curveBundle)
+            // .curve(d3.curveBundle)
 
         )
 

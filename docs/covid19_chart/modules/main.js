@@ -38,7 +38,7 @@ var set_chart_variables = () => {
 
         if (input_state.x == 'date') {
             input_state.fx = 'Date';
-            chart.fx(d3.scaleTime())
+            chart.fx = d3.scaleTime()
             xlog.property('checked', false);
             xlog.property('disabled', true);
         } else {
@@ -49,13 +49,11 @@ var set_chart_variables = () => {
 
     if (xlog.property('checked') && input_state.fx != 'Log' && input_state.fx != 'Date') {
         // set x logaritmic
-        chart.fx(d3.scaleLog());
+        chart.fx = d3.scaleLog();
         input_state.fx = 'Log'
     } else if (!xlog.property('checked') && input_state.fx != 'Linear' && input_state.fx != 'Date') {
         // set x linear
-        console.log(' x lin ');
-
-        chart.fx(d3.scaleLinear());
+        chart.fx = d3.scaleLinear();
         input_state.fx = 'Linear'
     }
 
@@ -65,11 +63,11 @@ var set_chart_variables = () => {
     }
     if (ylog.property('checked') && input_state.fy != 'Log') {
         // set y logaritmic
-        chart.fy(d3.scaleLog());
+        chart.fy = d3.scaleLog();
         input_state.fy = 'Log'
     } else if (!ylog.property('checked') && input_state.fy != 'Linear') {
         // set y linear
-        chart.fy(d3.scaleLinear());
+        chart.fy = d3.scaleLinear();
         input_state.fy = 'Linear'
     }
 }
