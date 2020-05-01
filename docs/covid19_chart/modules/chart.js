@@ -113,7 +113,7 @@ class Chart {
 
             if (scale.ticks()[0] && typeof(scale.ticks()[0]['toISOString']) === 'function') {
                 //date 
-                scale.clamp(false);
+                // scale.clamp(false);
             } else {
                 if (scale['base'] !== undefined) {
                     // hack for 0 in log scales
@@ -125,14 +125,14 @@ class Chart {
                         domain[1] = 1;
                     }
                 } else {
-                    scale.clamp(false);
+                    // scale.clamp(false);
                 }
                 axis.tickFormat(d3.format(".0s"))
             }
 
             scale.domain(domain);
             obj._axisgroups[xy]
-                .transition().duration(notransition ? 0 : config.transition_duration)
+                // .transition().duration(notransition ? 0 : config.transition_duration)
                 .call(axis);
 
         }
@@ -152,7 +152,7 @@ class Chart {
 
     add_curve(name = '', data = [], id = '', options = {}) {
         let g = this.canvas.append('g').classed(name, true);
-        let curve = this.curves[name] = new ChartCurve(g, data, id, this._x, this._y, options);
+        let curve = this.curves[name] = new ChartCurve(name, g, data, id, this._x, this._y, options);
         curve.draw(this._scale.x, this._scale.y);
     }
 
@@ -200,7 +200,8 @@ class Chart {
 }
 
 class ChartCurve {
-    constructor(g = undefined, data = [], id = '', x = '', y = '', options = {}) {
+    constructor(name = '', g = undefined, data = [], id = '', x = '', y = '', options = {}) {
+        this.name = name;
         this.data = data;
         this.id = id;
         this._x = x;
@@ -237,12 +238,13 @@ class ChartCurve {
             notransition = true;
         }
 
-        l.datum(this.data).transition().duration(notransition ? 0 : config.transition_duration).attr("d", d3.line()
-            .x(function(d) { return fx(d[curve._x]) })
-            .y(function(d) { return fy(d[curve._y]) })
-            // .curve(d3.curveBundle)
-
-        )
+        l.datum(this.data)
+            .transition().duration(notransition ? 0 : config.transition_duration)
+            .attr("d", d3.line()
+                .x(function(d) { return fx(d[curve._x]) })
+                .y(function(d) { return fy(d[curve._y]) })
+                .curve(d3.curveBasis)
+            )
 
         //points
         let a = this.g.selectAll('circle.curve_point')

@@ -15,10 +15,13 @@ let data = {
     prepped: {},
 }
 
+let scales = ['confirmed', 'deaths', 'delta_confirmed', 'delta_deaths', 'delta_recovered', 'recovered', ]
+
 let xlog = d3.select('input#xaxis_log');
 let ylog = d3.select('input#yaxis_log');
 let xvar = d3.select('select#xaxis_var').node();
 let yvar = d3.select('select#yaxis_var').node();
+let daysvar = d3.select('input#days').node();
 xlog.attr('disabled', true);
 
 let input_state = {
@@ -26,13 +29,55 @@ let input_state = {
     fx: 'Date',
     y: 'confirmed',
     fy: 'Linear',
+    smooth_days: 7,
+}
+
+// with smooth days: put the data in x and y variables.
+// TODO: only do for shown curves
+var calc_xy_variables = (x, y, d) => {
+    Object.keys(data.prepped).forEach((e) => {
+        // if (e != "Netherlands") {
+        //     return;
+        // }
+        let cdata = data.prepped[e];
+
+        for (let i = 0; i < cdata.array.length; i++) {
+            // console.log(i)
+            let today_data = cdata.array[i];
+            today_data['x'] = today_data[x];
+            today_data['y'] = today_data[y];
+
+            let rdate = new Date(today_data['date']);
+            let countdays = 1;
+
+            for (let j = 1; j < d; j++) {
+                rdate.setDate(rdate.getDate() - 1);
+                let id = (rdate.getMonth() + 1) + '/' + rdate.getDate() + '/' + (rdate.getYear() - 100);
+                let earlierday = cdata['dates'][id];
+                if (earlierday) {
+                    today_data['x'] += earlierday[x];
+                    today_data['y'] += earlierday[y];
+                    countdays++;
+                }
+            }
+
+            today_data['x'] /= countdays;
+            today_data['y'] /= countdays;
+        }
+    })
+
 }
 
 // functie om de chartvariabelen en assen goed te zetten;
 var set_chart_variables = () => {
-    if (xvar.value != input_state.x) {
+    let smooth_days = daysvar.value;
+    if (smooth_days && Number(smooth_days) > 0) {
+        calc_xy_variables(xvar.value, yvar.value, smooth_days);
+    }
+
+    if (xvar.value != input_state.x || input_state.smooth_days != smooth_days) {
         input_state.x = xvar.value;
-        chart.x = input_state.x;
+        let x = input_state.x;
 
         if (input_state.x == 'date') {
             input_state.fx = 'Date';
@@ -40,9 +85,13 @@ var set_chart_variables = () => {
             xlog.property('checked', false);
             xlog.property('disabled', true);
         } else {
+            if (smooth_days && Number(smooth_days) > 0) {
+                x = 'x';
+            }
             input_state.fx = 'Change';
             xlog.property('disabled', false);
         }
+        chart.x = x;
     }
 
     if (xlog.property('checked') && input_state.fx != 'Log' && input_state.fx != 'Date') {
@@ -57,7 +106,12 @@ var set_chart_variables = () => {
 
     if (yvar.value != input_state.y) {
         input_state.y = yvar.value
-        chart.y = input_state.y
+        let y = input_state.y;
+        if (smooth_days && Number(smooth_days) > 0) {
+            y = 'y';
+        }
+
+        chart.y = y
     }
     if (ylog.property('checked') && input_state.fy != 'Log') {
         // set y logaritmic
@@ -68,6 +122,8 @@ var set_chart_variables = () => {
         chart.fy = d3.scaleLinear();
         input_state.fy = 'Linear'
     }
+
+    input_state.smooth_days = smooth_days;
 }
 
 set_chart_variables()
@@ -170,9 +226,6 @@ let prep_data = () => {
 
         })
         prepped['array'] = Object.values(prepped.dates);
-        // if (!smooth) {
-        //     smooth = prepped.dates[cc[i][0]];
-        // }
 
         // another loop, not very efficient
         for (let i = 0; i < prepped['array'].length; i++) {
@@ -181,8 +234,8 @@ let prep_data = () => {
             let pm = pop['Population'] / 1000000;
             // console.log(pm);
 
-            let x = ['confirmed', 'deaths', 'delta_confirmed', 'delta_deaths', 'delta_recovered', 'recovered', ]
-            x.forEach((e) => {
+
+            scales.forEach((e) => {
                 if (pm) {
                     current[e + '_pm'] = current[e] / pm;
                 } else {
@@ -195,7 +248,10 @@ let prep_data = () => {
 
         data.prepped[key] = prepped;
     }
-    console.log(data.prepped['Netherlands']);
+
+    if (daysvar.value && Number(daysvar.value) > 0) {
+        calc_xy_variables(xvar.value, yvar.value, daysvar.value);
+    }
 }
 
 let redraw = () => {
@@ -203,15 +259,15 @@ let redraw = () => {
     chart.reposistion_elements();
 }
 
-let points = {};
-let curves = {};
-
 window.addEventListener("resize", redraw);
 redraw();
 
 let draw_chart = () => {
-    chart.add_curve('Spanje', data.prepped['Spain'].array, 'date');
-    chart.add_curve('Nederland', data.prepped['Netherlands'].array, 'date', { color: "red" });
+    chart.add_curve('Spain', data.prepped['Spain'].array, 'date');
+    chart.add_curve('Italy', data.prepped['Italy'].array, 'date', { color: "red" });
+    chart.add_curve('Germany', data.prepped['Germany'].array, 'date', { color: "yellow" });
+    chart.add_curve('Belgium', data.prepped['Belgium'].array, 'date', { color: "blue" });
+    chart.add_curve('Nederland', data.prepped['Netherlands'].array, 'date', { color: "orange" });
 
     // chart.add_legend('Nederland', 'green');
     // chart.add_legend('Spanje', 'blue');
@@ -219,19 +275,19 @@ let draw_chart = () => {
     chart.adjust(true);
 }
 
-let test = () => {
-    // switch getoonde variabele
-    // chart.y = 'deaths';
-    // chart.fy(d3.scaleLog());
-    // chart.fx(d3.scaleLog(), 'deaths');
+// let test = () => {
+//     // switch getoonde variabele
+//     // chart.y = 'deaths';
+//     // chart.fy(d3.scaleLog());
+//     // chart.fx(d3.scaleLog(), 'deaths');
 
 
-    // let xy = d3.scaleLog().clamp(true);
+//     // let xy = d3.scaleLog().clamp(true);
 
-    // console.log(xy['base']);
+//     // console.log(xy['base']);
 
 
-}
-window.setTimeout(function() { test() }, 500);
+// }
+// window.setTimeout(function() { test() }, 500);
 
-// d3.select('button#test').on('click', test)
+// // d3.select('button#test').on('click', test)
