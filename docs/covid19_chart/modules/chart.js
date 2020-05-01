@@ -158,6 +158,8 @@ class Chart {
 
     add_legend(text = '', color = '') {
         this._legend.push({ text: text, color: color });
+
+        console.log(this._legend);
     }
 
     set x(value) {

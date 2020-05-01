@@ -65,7 +65,6 @@ var calc_xy_variables = (x, y, d) => {
             today_data['y'] /= countdays;
         }
     })
-
 }
 
 // functie om de chartvariabelen en assen goed te zetten;
@@ -263,14 +262,14 @@ window.addEventListener("resize", redraw);
 redraw();
 
 let draw_chart = () => {
-    chart.add_curve('Spain', data.prepped['Spain'].array, 'date');
+    chart.add_curve('Spain', data.prepped['Spain'].array, 'date', { color: "black" });
     chart.add_curve('Italy', data.prepped['Italy'].array, 'date', { color: "red" });
     chart.add_curve('Germany', data.prepped['Germany'].array, 'date', { color: "yellow" });
     chart.add_curve('Belgium', data.prepped['Belgium'].array, 'date', { color: "blue" });
-    chart.add_curve('Nederland', data.prepped['Netherlands'].array, 'date', { color: "orange" });
+    chart.add_curve('Netherlands', data.prepped['Netherlands'].array, 'date', { color: "orange" });
 
-    // chart.add_legend('Nederland', 'green');
-    // chart.add_legend('Spanje', 'blue');
+    chart.add_legend('Spain', 'black');
+    chart.add_legend('Netherlands', 'orange');
 
     chart.adjust(true);
 }
