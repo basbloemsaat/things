@@ -140,7 +140,8 @@ class Chart {
         adjust_xy('x')
         adjust_xy('y')
 
-        this.draw_curves(notransition)
+        this.draw_curves(notransition);
+        this.draw_legends();
     }
 
     draw_curves(notransition = false) {
@@ -148,6 +149,11 @@ class Chart {
         for (let i = 0; i < c.length; i++) {
             this.curves[c[i]].draw(this._scale.x, this._scale.y, notransition);
         }
+    }
+
+    draw_legends() {
+        console.log('x')
+        console.log(this._legend);
     }
 
     add_curve(name = '', data = [], id = '', options = {}) {
@@ -158,8 +164,6 @@ class Chart {
 
     add_legend(text = '', color = '') {
         this._legend.push({ text: text, color: color });
-
-        console.log(this._legend);
     }
 
     set x(value) {
