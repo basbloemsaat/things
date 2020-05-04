@@ -23,8 +23,6 @@ class Chart {
         this._axisgroups.x = g.append('g').classed('xaxis', true);
         this._axisgroups.y = g.append('g').classed('yaxis', true);
 
-
-
         // default scales, used for sizing
         this._scale.x = d3.scaleTime()
             .domain([new Date(2019, 11, 31), new Date()])
@@ -152,8 +150,9 @@ class Chart {
     }
 
     draw_legends() {
-        console.log('x')
-        console.log(this._legend);
+        const l = this.legend.selectAll('g.legendrow').data(this._legend);
+        l.exit().remove();
+
     }
 
     add_curve(name = '', data = [], id = '', options = {}) {
