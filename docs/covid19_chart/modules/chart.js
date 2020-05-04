@@ -153,6 +153,25 @@ class Chart {
         const l = this.legend.selectAll('g.legendrow').data(this._legend);
         l.exit().remove();
 
+        var news = l.enter()
+            .append('g').classed('legendrow', true);
+
+        news.append('rect')
+            .classed('legendcolor', true)
+            .attr('width', 20)
+            .attr('height', 15)
+        news.append('text')
+            .classed('legendtext', true)
+            .attr('transform', 'translate(25,3)')
+            .text('bla')
+
+        l.merge(news).each(function(d, i) {
+            d3.select(this).attr('transform', 'translate(0,' + (20 * i) + ')')
+            d3.select(this).select('rect').attr('fill', d.color)
+            d3.select(this).select('text').text(d.text)
+
+        })
+
     }
 
     add_curve(name = '', data = [], id = '', options = {}) {

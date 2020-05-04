@@ -164,6 +164,11 @@ Promise.all([
                 return d['Country (or dependent territory)']
             })
         .object(files[3]);
+
+    data.population['US'] = data.population['United States']
+
+    console.log(data.population);
+
     prep_data();
     draw_chart();
 }).catch(function(err) {
@@ -254,7 +259,11 @@ let prep_data = () => {
 }
 
 let redraw = () => {
-    svg.attr('height', window.innerHeight - Math.ceil(d3.select('div#chart_options').node().offsetHeight) - 10)
+    svg.attr('height',
+        window.innerHeight -
+        Math.ceil(d3.select('div#chart_options').node().offsetHeight) -
+        Math.ceil(d3.select('div#chart_footer').node().offsetHeight) -
+        10)
     chart.reposistion_elements();
 }
 
@@ -262,31 +271,40 @@ window.addEventListener("resize", redraw);
 redraw();
 
 let draw_chart = () => {
-    chart.add_curve('Spain', data.prepped['Spain'].array, 'date', { color: "black" });
-    chart.add_curve('Italy', data.prepped['Italy'].array, 'date', { color: "red" });
-    chart.add_curve('Germany', data.prepped['Germany'].array, 'date', { color: "yellow" });
     chart.add_curve('Belgium', data.prepped['Belgium'].array, 'date', { color: "blue" });
+    chart.add_legend('Belgium', 'blue');
+    chart.add_curve('Germany', data.prepped['Germany'].array, 'date', { color: "yellow" });
+    chart.add_legend('Germany', 'yellow');
+    chart.add_curve('Italy', data.prepped['Italy'].array, 'date', { color: "red" });
+    chart.add_legend('Italy', 'red');
     chart.add_curve('Netherlands', data.prepped['Netherlands'].array, 'date', { color: "orange" });
-
-    chart.add_legend('Spain', 'black');
     chart.add_legend('Netherlands', 'orange');
+    chart.add_curve('Spain', data.prepped['Spain'].array, 'date', { color: "black" });
+    chart.add_legend('Spain', 'black');
+    chart.add_curve('United Kingdom', data.prepped['United Kingdom'].array, 'date', { color: "green" });
+    chart.add_legend('United Kingdom', 'green');
+    chart.add_curve('US', data.prepped['US'].array, 'date', { color: "lightblue" });
+    chart.add_legend('United States', 'lightblue');
+
 
     chart.adjust(true);
 }
 
-// let test = () => {
-//     // switch getoonde variabele
-//     // chart.y = 'deaths';
-//     // chart.fy(d3.scaleLog());
-//     // chart.fx(d3.scaleLog(), 'deaths');
+
+let test = () => {
+    // switch getoonde variabele
+    // chart.y = 'deaths';
+    // chart.fy(d3.scaleLog());
+    // chart.fx(d3.scaleLog(), 'deaths');
 
 
-//     // let xy = d3.scaleLog().clamp(true);
+    // let xy = d3.scaleLog().clamp(true);
 
-//     // console.log(xy['base']);
+    // console.log(xy['base']);
 
+    console.log(data.prepped);
 
-// }
-// window.setTimeout(function() { test() }, 500);
+}
+window.setTimeout(function() { test() }, 500);
 
 // // d3.select('button#test').on('click', test)

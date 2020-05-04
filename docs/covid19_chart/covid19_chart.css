@@ -1,3 +1,7 @@
+html, body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
 div#container {
     min-height: 100%;
     display: flex;
@@ -39,4 +43,20 @@ path.curve {
     stroke: black;
     stroke-width: 1.5;
     opacity: 1
+}
+
+g.legend text {
+    font-size: 0.7rem;
+    alignment-baseline: hanging;
+}
+
+g.legend rect {
+    stroke: black;
+    stroke-width: 0.5;
+}
+
+div#chart_footer {
+    padding: 0 1rem 0 1rem;
+    text-align: right;
+    font-size: 0.7rem;
 }
