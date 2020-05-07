@@ -167,10 +167,7 @@ Promise.all([
 
     data.population['US'] = data.population['United States']
 
-    console.log(data.population);
-
     prep_data();
-    console.log(data);
     draw_chart();
 }).catch(function(err) {
     // handle error here
@@ -191,9 +188,23 @@ let prep_data = () => {
     // canada and china are split. Let's lump 'em together
     let unique_keys = [...new Set(Object.keys(data.confirmed), Object.keys(data.deaths), Object.keys(data.recovered))];
 
+    console.log(data);
+    let add_countries = [];
+
+    // the data has some countries split up (like Canada), and some partially (like The Netherlands). I only want to group the first.
     for (let i = 0; i < unique_keys.length; i++) {
         let key = unique_keys[i];
-        console.log(key)
+
+        let d = 
+             (data.confirmed[key] || data.deaths[key] || data.recovered[key] || [])[0] || {};
+        
+        let country = d['Country/Region'];
+
+        // if() {
+
+        // }
+
+
     }
 
 
@@ -312,7 +323,7 @@ let test = () => {
 
     // console.log(xy['base']);
 
-    console.log(data.prepped);
+    // console.log(data.prepped);
 
 }
 window.setTimeout(function() { test() }, 500);
