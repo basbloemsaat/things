@@ -170,6 +170,7 @@ Promise.all([
     console.log(data.population);
 
     prep_data();
+    console.log(data);
     draw_chart();
 }).catch(function(err) {
     // handle error here
@@ -187,7 +188,14 @@ let clone_data_obj = (obj) => {
 }
 
 let prep_data = () => {
+    // canada and china are split. Let's lump 'em together
     let unique_keys = [...new Set(Object.keys(data.confirmed), Object.keys(data.deaths), Object.keys(data.recovered))];
+
+    for (let i = 0; i < unique_keys.length; i++) {
+        let key = unique_keys[i];
+        console.log(key)
+    }
+
 
     for (let i = 0; i < unique_keys.length; i++) {
         let key = unique_keys[i];
@@ -285,6 +293,8 @@ let draw_chart = () => {
     chart.add_legend('United Kingdom', 'green');
     chart.add_curve('US', data.prepped['US'].array, 'date', { color: "lightblue" });
     chart.add_legend('United States', 'lightblue');
+    // chart.add_curve('Canada', data.prepped['Canada'].array, 'date', { color: "lightblue" });
+    // chart.add_legend('United States', 'lightblue');
 
 
     chart.adjust(true);
