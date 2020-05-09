@@ -60,3 +60,8 @@ div#chart_footer {
     text-align: right;
     font-size: 0.7rem;
 }
+
+.axis line {
+  stroke: lightgrey;
+  shape-rendering: crispEdges;
+}

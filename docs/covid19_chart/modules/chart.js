@@ -18,10 +18,17 @@ class Chart {
         this._axisgroups = {};
 
         let g = this.g = svg.append('g')
-        this.canvas = g.append('g').classed('canvas', true);
-        this.legend = this.canvas.append('g').classed('legend', true).attr('transform', 'translate(' + config.padding + ',' + config.padding + ')');
-        this._axisgroups.x = g.append('g').classed('xaxis', true);
-        this._axisgroups.y = g.append('g').classed('yaxis', true);
+        this._axisgroups.x = g.append('g')
+            .classed('axis', true)
+            .classed('xaxis', true);
+        this._axisgroups.y = g.append('g')
+            .classed('axis', true)
+            .classed('yaxis', true);
+        this.canvas = g.append('g')
+            .classed('canvas', true);
+        this.legend = this.canvas.append('g')
+            .classed('legend', true)
+            .attr('transform', 'translate(' + config.padding + ',' + config.padding + ')');
 
         // default scales, used for sizing
         this._scale.x = d3.scaleTime()
@@ -62,10 +69,10 @@ class Chart {
             .attr('transform', 'translate(' + (y_width + config.padding) + ',' + config.padding + ')')
 
         this._scale.x.range([0, canvas_width]);
-        this._axisgroups.x.transition().call(this._axis.x);
+        this._axisgroups.x.transition().call(this._axis.x.tickSize(-canvas_height));
 
         this._scale.y.range([0, canvas_height]);
-        this._axisgroups.y.transition().call(this._axis.y);
+        this._axisgroups.y.transition().call(this._axis.y.tickSize(-canvas_width));
 
         this.draw_curves()
     }
