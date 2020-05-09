@@ -50,8 +50,14 @@ class Chart {
 
     // makes the chart fit the svg
     reposistion_elements() {
-        let x_height = this._axisgroups.x.node().getBBox()['height'];
-        let y_width = this._axisgroups.y.node().getBBox()['width'];
+        let x_height = this._axisgroups.x.node().getBBox()['height'] -
+            this._axisgroups.x.select("g.tick").select('line').node().getBBox()['height']
+
+        let y_width = this._axisgroups.y.node().getBBox()['width'] -
+            this._axisgroups.y.select("g.tick").select('line').node().getBBox()['width']
+
+
+
 
         let svg_height = this.svg.node().clientHeight;
         let svg_width = this.svg.node().clientWidth;

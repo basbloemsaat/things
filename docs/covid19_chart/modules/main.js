@@ -200,11 +200,6 @@ let prep_data = () => {
         
         let country = d['Country/Region'];
 
-        // if() {
-
-        // }
-
-
     }
 
 
@@ -308,7 +303,9 @@ let draw_chart = () => {
     // chart.add_legend('United States', 'lightblue');
 
 
+    // chart.reposistion_elements();
     chart.adjust(true);
+    redraw();
 }
 
 
