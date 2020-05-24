@@ -1,0 +1,27 @@
+div#header {
+    grid-area: header;
+}
+
+div#chart {
+    grid-area: chart;
+}
+
+div#chart_options {
+    grid-area: chart_options;
+}
+
+div#footer {
+    grid-area: footer;
+}
+
+div#container {
+    display: grid;
+    grid-template-columns: auto 10em;
+    grid-template-rows: 2em auto 2em;
+
+    grid-template-areas:
+        "header header"
+        "chart chart_options"
+        "footer footer";
+
+}
