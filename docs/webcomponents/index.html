@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>web components testje</title>
+    <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+    <style>
+        test-wc {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <test-wc name="test name"> boe 
+        <div slot='testslot'> slot dus </div>
+
+    </test-wc>
+    <test-wc name="test name2"></test-wc>
+    <script type="module" src="./js/main.js"> </script>
+</body>
+
+</html>
