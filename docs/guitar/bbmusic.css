@@ -1,0 +1,105 @@
+svg {
+    border: 0px solid black;
+}
+
+.string {
+    stroke: rgba(0, 0, 0, 0.5);
+    stroke-width: 1;
+}
+
+.fret_line {
+    stroke: rgba(0, 0, 0, 1);
+    stroke-width: 1;
+}
+
+.fret_first {
+    stroke-width: 5;
+}
+
+div#staff {
+    /*border: 1px solid green;*/
+    width: 100%;
+}
+
+svg.staff {
+    width: 100%;
+    height: 275px;
+}
+
+g.tab text,
+g.time_signature text {
+    font-weight: bold;
+}
+
+g.tab text {
+    font-family: verdana, sans-serif;
+}
+
+g.time_signature text {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+
+.staff_lines line,
+.tab_lines line {
+    stroke: black;
+    stroke-width: 1;
+    stroke-opacity: 1;
+    shape-rendering: crispEdges;
+}
+
+line.connect {
+    stroke: black;
+    stroke-width: 2;
+    stroke-opacity: 1;
+    shape-rendering: crispEdges;
+}
+
+
+.yaxis path {
+    /*stroke-width: 0;*/
+}
+
+g.tab g.notes text {
+    font-size: 0.8em;
+}
+
+g.tab g.notes circle {
+    fill: white;
+}
+
+g.staff_lines g.tick text,
+g.tab_lines g.tick text {
+    display: none;
+}
+
+g.scale_x {
+    /*display: none;*/
+    opacity: 0.1;
+}
+
+.note circle {
+    fill: none;
+    stroke: black;
+    stroke-width: 2;
+    stroke-opacity: 1;
+}
+
+.note circle.filled {
+    fill: black;
+}
+
+line.stem {
+    stroke: black;
+    stroke-width: 2;
+    stroke-opacity: 1;
+}
+
+path.flag {
+    fill-opacity: 1;
+    fill: black;
+    stroke: #000000;
+    stroke-width: 0;
+    stroke-miterlimit: 4;
+    stroke-opacity: 0.26666667;
+    stroke-dasharray: none
+}

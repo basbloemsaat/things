@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>staff</title>
+    <link rel="stylesheet" href="/guitar/bbmusic.css" name="guitar-css">
+    <style>
+    div#staff {
+        /*border: 1px solid green;*/
+        width: 100%;
+    }
+
+    svg.staff {
+        width: 100%;
+        height: 275px;
+    }
+
+    g.tab text,
+    g.time_signature text {
+        font-weight: bold;
+    }
+
+    g.tab text {
+        font-family: verdana, sans-serif;
+    }
+
+    g.time_signature text {
+        font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    }
+
+    .staff_lines line,
+    .tab_lines line {
+        stroke: black;
+        stroke-width: 1;
+        stroke-opacity: 1;
+        shape-rendering: crispEdges;
+    }
+
+    line.connect {
+        stroke: black;
+        stroke-width: 2;
+        stroke-opacity: 1;
+        shape-rendering: crispEdges;
+    }
+
+
+    .yaxis path {
+        /*stroke-width: 0;*/
+    }
+
+    g.tab g.notes text {
+        font-size: 0.8em;
+    }
+
+    g.tab g.notes circle {
+        fill: white;
+    }
+
+    g.staff_lines g.tick text,
+    g.tab_lines g.tick text {
+        display: none;
+    }
+
+    g.scale_x {
+        /*display: none;*/
+        opacity: 0.1;
+    }
+
+    .note circle {
+        fill: none;
+        stroke: black;
+        stroke-width: 2;
+        stroke-opacity: 1;
+    }
+
+    .note circle.filled {
+        fill: black;
+    }
+
+    line.stem {
+        stroke: black;
+        stroke-width: 2;
+        stroke-opacity: 1;
+    }
+
+    path.flag {
+        fill-opacity: 1;
+        fill: black;
+        stroke: #000000;
+        stroke-width: 0;
+        stroke-miterlimit: 4;
+        stroke-opacity: 0.26666667;
+        stroke-dasharray: none
+    }
+    </style>
+</head>
+
+<body>
+    <div id="staff"> </div>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="/guitar/bbmusic.js"></script>
+    <script src="./tabstaff.js"></script>
+    <script>
+    var tabstaff = new BBMusic.tabstaff(d3.select("div#staff"));
+    tabstaff.add_time_signature(0, "4/4");
+
+    // tabstaff.add_note(0, 1, 5, 4);
+    tabstaff.add_note(1, 3, 0, 1);
+    tabstaff.add_note(2, 3, 2, 2);
+    tabstaff.add_note(3, 3, 4, 4);
+    tabstaff.add_note(4, 3, 5, 8);
+    tabstaff.add_note(5, 3, 5, 16);
+
+    // tabstaff.add_note(2, 1, 0, 4);
+    // tabstaff.add_note(2, 2, 0, 4);
+    // tabstaff.add_note(2, 3, 0, 4);
+    // tabstaff.add_note(2, 4, 0, 4);
+    // tabstaff.add_note(2, 5, 0, 4);
+    // tabstaff.add_note(2, 6, 0, 4);
+
+    // tabstaff.add_note(3, 1, 5, 4);
+    // tabstaff.add_note(3, 2, 4, 4);
+
+    tabstaff.add_note(6, 2, 1, 4);
+    tabstaff.add_note(7, 4, 2, 4);
+    tabstaff.add_note(8, 6, 0, 4);
+    tabstaff.add_note(9, 1, 15, 4);
+
+    tabstaff.add_note(12, 2, 2, 4);
+    tabstaff.add_note(12, 3, 2, 4);
+    tabstaff.add_note(12, 4, 2, 4);
+    tabstaff.add_note(12, 5, 0, 4);
+
+    // tabstaff.add_note(9, 2, 3, 4);
+    // tabstaff.add_note(10, 1, 3, 4);
+
+    // tabstaff.show_song(flintstones);
+    // var tabx = new BBMusic.tabx(flintstones);
+    // console.log(tabx);
+    </script>
+</body>
+
+</html>

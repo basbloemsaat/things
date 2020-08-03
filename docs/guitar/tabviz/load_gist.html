@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>tab editor</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="/guitar/bbmusic.css" name="guitar-css">
+    <style>
+    div#editform {
+        border: 0px solid red;
+        position: absolute;
+        bottom: 0;
+        height: 250px;
+        width: 100%;
+    }
+
+    textarea#tabedit {
+        resize: none;
+        height: 240px;
+        width: 100%;
+        font-family: Courier, monospace;
+    }
+    </style>
+</head>
+
+<body>
+    <h1>gist test</h1>
+    <div id="staff">
+    </div>
+    <div id="editform">
+        <textarea id="tabedit"> </textarea>
+    </div>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="/guitar/bbmusic.js"></script>
+    <script src="/guitar/notation/tabstaff.js"></script>
+    <script src="./bbtabviz.js"></script>
+    <script>
+    var test_gist = '236d7f72298c385ee5c33ee3698e6f54';
+
+
+    var init_page = function() {
+
+        load_song(test_gist);
+    };
+
+    var load_song = function(gist_id) {
+        var uri = 'https://api.github.com/gists/' + gist_id;
+        d3.json(uri, function(error, data) {
+            console.log(data);
+            update_page(data);
+        });
+
+    };
+
+    var update_page = function(data) {
+
+        for (var file_name in data.files) {
+            if (file_name.match(/\.tab$/)) {
+                console.log(file_name);
+
+                d3.select("textarea#tabedit").property('value', data.files[file_name].content)
+            }
+        }
+
+        var song = new BBTabViz.song(d3.select("textarea#tabedit").property('value'));
+        var tabstaff = new BBMusic.tabstaff(d3.select("div#staff"));
+        tabstaff.add_time_signature(0, "4/4");
+
+        for (var i = 0; i < song.ticks.length; i++) {
+            for (var j = 0; j < 6; j++) {
+                if (song.ticks[i][j] != "") {
+                    tabstaff.add_note(i + 1, j + 1, song.ticks[i][j], 4);
+                }
+            }
+        }
+
+    }
+
+    init_page();
+    </script>
+</body>
+
+</html>
