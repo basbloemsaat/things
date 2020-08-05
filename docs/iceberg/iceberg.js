@@ -10,8 +10,9 @@ let g =
 var width = 400,
     height = 600,
     caret = 150,
-    water = 100,
-    wave = 10
+    water = 60,
+    wave = 10,
+    sin_i = 50
 
 let kite = [
     [width / 2, 0],
@@ -19,6 +20,22 @@ let kite = [
     [width / 2, height],
     [0, caret],
 ];
+
+let wave_x = d3.scaleLinear()
+    .domain([0, sin_i])
+    .range([0, width]);
+
+let wave_y = d3.scaleLinear()
+    .domain([-1, 1])
+    .range([water - wave, water + wave]);
+
+let sinvals = d3.range(0, sin_i).map(function(d, i) {
+    return [wave_x(i), wave_y(Math.sin(i * 2 / Math.PI))]
+});
+
+
+
+
 
 g.append('path')
     .attr('d', "M" + kite.join('L') + "Z")
@@ -33,7 +50,10 @@ g.append('path')
 
 var sitesx = d3.range(50).map(function(d) {
     return [Math.random() * width, Math.random() * height];
-}).filter(function(point) {
+})
+
+sitesx = sitesx.concat(sinvals);
+sitesx = sitesx.filter(function(point) {
     var x = point[0],
         y = point[1];
 
@@ -87,31 +107,30 @@ var triangles = g.append("g")
     .data(voronoi.triangles(sites))
     .enter().append("path")
     .call(redrawPolygon)
-    .attr('fill', function(d,i,b) {
+    .attr('fill', function(d, i, b) {
         //todo: color according to position
-        console.log(d,i,JSON.stringify(b));
-        if(
+        if (
             d[0] == kite[0] ||
             d[1] == kite[0] ||
             d[2] == kite[0]
 
         ) {
             return '#0f0'
-        } 
+        }
 
-        if(
+        if (
             d[0] == kite[2] ||
             d[1] == kite[2] ||
             d[2] == kite[2]
 
         ) {
             return '#000'
-        } 
-        
+        }
+
 
 
         return '#f00';
-        
+
     });
 
 
@@ -123,13 +142,13 @@ var triangles = g.append("g")
 //     .call(redrawLink);
 
 
-// var site = g.append("g")
-//     .attr("class", "sites")
-//     .selectAll("circle")
-//     .data(sites)
-//     .enter().append("circle")
-//     .attr("r", 2.5)
-//     .call(redrawSite);
+var site = g.append("g")
+    .attr("class", "sites")
+    .selectAll("circle")
+    .data(sinvals)
+    .enter().append("circle")
+    .attr("r", 2.5)
+    .call(redrawSite);
 
 function redrawPolygon(polygon) {
     polygon
